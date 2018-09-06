@@ -1,6 +1,7 @@
 FLAGS = -fPIC -std=gnu11 -Wall -Wno-unused-result -pedantic
-
+CC = gcc
 BIN = ./bin
+.DEFAULT_GOAL := CNNlayer
 
 LIBSVM_DIR = ./externals/libsvm
 LIBNIFTI_DIR= ./externals/libnifti
