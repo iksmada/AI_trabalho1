@@ -198,8 +198,18 @@ iftMImage *Convolution(iftMImage *mult_img, MKernel *K)
 
 iftMatrix *ReadMKernelBank(char *filename)
 {
+    FILE *fp = fopen(filename, "r");
+    int        nbands, xsize, ysize, nkernels;
+    iftMatrix *M;
+    fscanf(fp,"%d %d %d %d",&nbands, &xsize, &ysize, &nkernels);
+    M = iftCreateMatrix(xsize*ysize*nbands, nkernels);
+    for (int j=0;j < M->nrows; j++) {
+        for (int i = 0; i < M->ncols; i++)
+                fscanf(fp, "%f", &iftMatrixElem(M,i,j));
+    }
+    fclose(fp);
 
-  return(NULL);
+    return(M);
 }
 
 /* Extend a multi-band image to include the adjacent values in a same
@@ -207,7 +217,6 @@ iftMatrix *ReadMKernelBank(char *filename)
 
 iftMatrix *MImageToMatrix(iftMImage *mult_img, iftAdjRel *A)
 {
-
   return(NULL);
 }
 
