@@ -202,7 +202,7 @@ iftMatrix *ReadMKernelBank(char *filename)
     int        nbands, xsize, ysize, nkernels;
     iftMatrix *M;
     fscanf(fp,"%d %d %d %d",&nbands, &xsize, &ysize, &nkernels);
-    M = iftCreateMatrix(xsize*ysize*nbands, nkernels);
+    M = iftCreateMatrix(xsize*ysize*nbands + 1 , nkernels);
     for (int j=0;j < M->nrows; j++) {
         for (int i = 0; i < M->ncols; i++)
                 fscanf(fp, "%f", &iftMatrixElem(M,i,j));
