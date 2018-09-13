@@ -195,6 +195,7 @@ iftMatrix *ReadMKernelBank(char *filename) {
     iftMatrix *M;
     fscanf(fp, "%d %d %d %d", &nbands, &xsize, &ysize, &nkernels);
     M = iftCreateMatrix(xsize * ysize * nbands + 1, nkernels);
+    //TODO work with M->n not with rows and cols
     for (int j = 0; j < M->nrows; j++) {
         for (int i = 0; i < M->ncols; i++)
             fscanf(fp, "%f", &iftMatrixElem(M, i, j));
@@ -222,9 +223,20 @@ iftMatrix *ConvolutionByMatrixMult(iftMatrix *Ximg, iftMatrix *W) {
 
 /* Convert an image matrix into a multi-band image */
 
-iftMImage *MatrixToMImage(iftMatrix *Ximg) {
+iftMImage *MatrixToMImage(iftMatrix *Ximg, xsize, ysize, zsize) {
 
-    return (NULL);
+    iftMImage *m_img;
+    m_img = iftCreateMImage(xsize, ysize, zsize, Ximg->nrows);
+
+    for (int p = 0; p < m_img->n; p++) {
+        iftVoxel u = iftMGetVoxelCoord(m_img, p);
+        for (int b = 0; b < m_img->m; b++) {
+            m_img->band[b].val[p] = iftMatrixElem(Ximg, p, b);
+        }
+    }
+
+    return (m_img);
+
 }
 
 int main(int argc, char *argv[]) {
