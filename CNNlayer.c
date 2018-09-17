@@ -16,6 +16,23 @@
    kernel.txt and kernel-bank.txt. Read ExplicacaoArquivosKernels.txt
    to understand their content. */
 
+typedef struct matrixinfo {
+    iftMatrix *M;
+    int nbands, ncol, nrow, nkernels;
+} MatrixInfo;
+
+MatrixInfo *CreateMatrixInfo(iftMatrix *M, int nbands, int ncol, int nrow) {
+    MatrixInfo *minfo = (MatrixInfo *) iftAlloc(1, sizeof(MatrixInfo));
+
+    minfo->M = M;
+    minfo->nbands = nbands;
+    minfo->ncol = ncol;
+    minfo->nrow = nrow;
+    minfo->nkernels = M->nrows;
+
+    return minfo;
+}
+
 typedef struct mkernel {
     iftAdjRel *A;
     iftBand *weight;
@@ -189,7 +206,7 @@ iftMImage *Convolution(iftMImage *mult_img, MKernel *K) {
 /* Read file kernel-bank.txt (see ExplicacaoArquivosKernels.txt) and
    return it in a iftMatrix */
 
-iftMatrix *ReadMKernelBank(char *filename) {
+MatrixInfo *ReadMKernelBank(char *filename) {
     FILE *fp = fopen(filename, "r");
     int nbands, xsize, ysize, nkernels;
     iftMatrix *M;
@@ -202,7 +219,7 @@ iftMatrix *ReadMKernelBank(char *filename) {
     }
     fclose(fp);
 
-    return (M);
+    return CreateMatrixInfo(M, nbands, xsize, ysize);
 }
 
 /* Extend a multi-band image to include the adjacent values in a same
