@@ -369,7 +369,7 @@ void RegionOfPlates(iftImage **mask, int nimages, NetParameters *nparam)
   bb.end.y   = -1;
   for (int i=0; i < nimages; i++) {
     for (int p=0; p < mask[i]->n; p++) {
-      if (mask[i]->val[p]!=0) {
+      if (mask[i]->val[p] > 0) {
 	iftVoxel u = iftGetVoxelCoord(mask[i],p);
 	if (u.x < bb.begin.x) bb.begin.x = u.x;
 	if (u.y < bb.begin.y) bb.begin.y = u.y;
@@ -393,11 +393,12 @@ void RemoveActivationsOutOfRegionOfPlates(iftMImage **mimg, int nimages, NetPara
       iftVoxel u = iftMGetVoxelCoord(mimg[i],p);
       if ((u.x < nparam->bb.begin.x)||(u.y < nparam->bb.begin.y)||
 	  (u.x > nparam->bb.end.x)||(u.y > nparam->bb.end.y)) {
-	for (int b=0; b < mimg[i]->m; b++)  
+	for (int b=0; b < mimg[i]->m; b++){  
 	  mimg[i]->band[b].val[p] = 0;
+	}
       }
     }
-  }
+  }  
 }
 
 iftMImage **CombineBands(iftMImage **mimg, int nimages, float *weight)
@@ -479,45 +480,42 @@ void PostProcess(iftImage **bin, int nimages, NetParameters *nparam)
   iftAdjRel *A=iftCircular(sqrtf(2.0));
 
   for (int i=0; i < nimages; i++) {
-    iftImage *aux;
+    iftImage *aux[2];
     iftSet *S=NULL;
-    aux = iftErodeBin(bin[i],&S,8.0);
-    iftDestroyImage(&bin[i]);
-    bin[i] = iftDilateBin(aux,&S,10.0); //iftAsfOCBin(aux,5.0);
-    iftDestroyImage(&aux);
-    aux = iftErodeBin(bin[i],&S,5.0);
+    aux[0] = iftAddFrame(bin[i],15,0);
+    aux[1] = iftErodeBin(aux[0],&S,8.0);
+    iftDestroyImage(&aux[0]);
+    aux[0] = iftDilateBin(aux[1],&S,10.0); 
+    iftDestroyImage(&aux[1]);
+    aux[1] = iftErodeBin(aux[0],&S,5.0);
+    iftDestroyImage(&aux[0]);
+    aux[0] = iftRemFrame(aux[1],15);
+    iftDestroyImage(&aux[1]);
     iftDestroyImage(&bin[i]);
     iftDestroySet(&S);
-    bin[i]    = iftFastLabelComp(aux,A);    
-    iftDestroyImage(&aux);
+    bin[i]    = iftFastLabelComp(aux[0],A);    
+    iftDestroyImage(&aux[0]);
     SelectCompClosestTotheMeanWidthAndHeight(bin[i], nparam->mean_width, nparam->mean_height); 
-    int             Lmax = iftMaximumValue(bin[i]);
-    iftBoundingBox *bb = (iftBoundingBox *)calloc(Lmax+1,sizeof(iftBoundingBox));
-    for (int o=1; o <= Lmax; o++) {
-      iftImage *obj = iftExtractObject(bin[i],o);
-      iftVoxel  pos, u, uo, uf;
-      bb[o]         = iftMinBoundingBox(obj, &pos);
-      u.z=uo.z=uf.z=0;
-      int xsize = bb[o].end.x - bb[o].begin.x;
-      int ysize = bb[o].end.y - bb[o].begin.y;
-      int xcenter = bb[o].begin.x + xsize/2;
-      int ycenter = bb[o].begin.y + ysize/2;
-      
-      uo.x = iftMax(0,xcenter - nparam->mean_width/2 - 25);
-      uo.y = iftMax(0,ycenter - nparam->mean_height/2 -25);
-      uf.x = iftMin(bin[i]->xsize-1,xcenter + nparam->mean_width/2 + 25);
-      uf.y = iftMin(bin[i]->ysize-1,ycenter + nparam->mean_height/2 + 25);
+    iftVoxel  pos, u, uo, uf;
+    iftBoundingBox  bb = iftMinBoundingBox(bin[i], &pos);
 
-      for (int p=0; p < bin[i]->n; p++)
-	bin[i]->val[p]=0;
+    u.z=uo.z=uf.z=0;
+
+    int xsize   = bb.end.x - bb.begin.x;
+    int ysize   = bb.end.y - bb.begin.y;
+    int xcenter = bb.begin.x + xsize/2;
+    int ycenter = bb.begin.y + ysize/2;
       
-      for (u.y = uo.y; u.y <= uf.y; u.y++)
-    	for (u.x = uo.x; u.x <= uf.x; u.x++){
-    	  int p = iftGetVoxelIndex(bin[i],u);
-    	  bin[i]->val[p]=255;
-    	}
-      iftDestroyImage(&obj);
-    }
+    uo.x = iftMax(0,xcenter - nparam->mean_width/2 - 25);
+    uo.y = iftMax(0,ycenter - nparam->mean_height/2 - 25);
+    uf.x = iftMin(bin[i]->xsize-1,xcenter + nparam->mean_width/2 + 25);
+    uf.y = iftMin(bin[i]->ysize-1,ycenter + nparam->mean_height/2 + 25);
+      
+    for (u.y = uo.y; u.y <= uf.y; u.y++)
+      for (u.x = uo.x; u.x <= uf.x; u.x++){
+	int p = iftGetVoxelIndex(bin[i],u);
+	bin[i]->val[p]=255;
+      }
   }
   
   iftDestroyAdjRel(&A);
