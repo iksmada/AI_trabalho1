@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
   NetParameters *nparam = CreateNetParameters(mimg[0]->m);
   ComputeAspectRatioParameters(mask,trainSet->n,nparam);
   RegionOfPlates(mask,trainSet->n,nparam);
-  RemoveActivationsOutOfRegionOfPlates(mimg, trainSet->n, nparam);
+  //RemoveActivationsOutOfRegionOfPlates(mimg, trainSet->n, nparam);
   NormalizeActivationValues(mimg,trainSet->n,255,nparam);
 
   /* Find the best kernel weights */
@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
   /* Combine bands, find optimum threshold, and apply it */
   
   cbands = CombineBands(mimg, trainSet->n, nparam->weight);
-  //  RemoveActivationsOutOfRegionOfPlates(cbands, trainSet->n, nparam);
+  RemoveActivationsOutOfRegionOfPlates(cbands, trainSet->n, nparam);
   FindBestThreshold(cbands, mask, trainSet->n,nparam);
   WriteNetParameters(nparam,argv[3]);
   iftImage **bin = ApplyThreshold(cbands, trainSet->n, nparam);

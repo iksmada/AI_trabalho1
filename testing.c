@@ -42,13 +42,13 @@ int main(int argc, char *argv[])
 
   /* Normalize activation values within [0,255] */
 
-  RemoveActivationsOutOfRegionOfPlates(mimg, testSet->n, nparam);
+  //RemoveActivationsOutOfRegionOfPlates(mimg, testSet->n, nparam);
   NormalizeActivationValues(mimg,testSet->n,255,nparam);
 
   /* Combine bands */
   
   cbands = CombineBands(mimg, testSet->n, nparam->weight);
-  //  RemoveActivationsOutOfRegionOfPlates(cbands, testSet->n, nparam);
+  RemoveActivationsOutOfRegionOfPlates(cbands, testSet->n, nparam);
 
   iftImage **bin = ApplyThreshold(cbands, testSet->n, nparam);
 

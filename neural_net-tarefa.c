@@ -219,8 +219,6 @@ iftMImage  *MaxPooling(iftMImage *mult_img, iftAdjRel *A)
   return(pool_img);
 }
 
-/* Substitutes strides > 1 */
-
 iftMImage  *MinPooling(iftMImage *mult_img, iftAdjRel *A)
 {
   iftMImage *pool_img = iftCreateMImage(mult_img->xsize,mult_img->ysize,mult_img->zsize,mult_img->m);
@@ -367,8 +365,8 @@ void RegionOfPlates(iftImage **mask, int nimages, NetParameters *nparam)
 
   bb.begin.x = mask[0]->n;
   bb.begin.y = mask[0]->n;
-  bb.end.x   = 0;
-  bb.end.y   = 0;
+  bb.end.x   = -1;
+  bb.end.y   = -1;
   for (int i=0; i < nimages; i++) {
     for (int p=0; p < mask[i]->n; p++) {
       if (mask[i]->val[p]!=0) {
@@ -432,7 +430,6 @@ iftMImage **CombineBands(iftMImage **mimg, int nimages, float *weight)
 void FindBestThreshold(iftMImage **cbands, iftImage **mask, int nimages, NetParameters *nparam)
 {
   nparam->threshold = 0.0;
-
 }
 
 iftImage **ApplyThreshold(iftMImage **cbands, int nimages, NetParameters *nparam)
@@ -501,13 +498,21 @@ void PostProcess(iftImage **bin, int nimages, NetParameters *nparam)
       iftVoxel  pos, u, uo, uf;
       bb[o]         = iftMinBoundingBox(obj, &pos);
       u.z=uo.z=uf.z=0;
-      uo.x = iftMax(0,bb[o].begin.x - 25);
-      uo.y = iftMax(0,bb[o].begin.y - 5);
-      uf.x = iftMin(bin[i]->xsize-1,bb[o].end.x + 25);
-      uf.y = iftMin(bin[i]->ysize-1,bb[o].end.y + 5);
-	  
-      for (u.y = uo.y; u.y < uf.y; u.y++)
-    	for (u.x = uo.x; u.x < uf.x; u.x++){
+      int xsize = bb[o].end.x - bb[o].begin.x;
+      int ysize = bb[o].end.y - bb[o].begin.y;
+      int xcenter = bb[o].begin.x + xsize/2;
+      int ycenter = bb[o].begin.y + ysize/2;
+      
+      uo.x = iftMax(0,xcenter - nparam->mean_width/2 - 25);
+      uo.y = iftMax(0,ycenter - nparam->mean_height/2 -25);
+      uf.x = iftMin(bin[i]->xsize-1,xcenter + nparam->mean_width/2 + 25);
+      uf.y = iftMin(bin[i]->ysize-1,ycenter + nparam->mean_height/2 + 25);
+
+      for (int p=0; p < bin[i]->n; p++)
+	bin[i]->val[p]=0;
+      
+      for (u.y = uo.y; u.y <= uf.y; u.y++)
+    	for (u.x = uo.x; u.x <= uf.x; u.x++){
     	  int p = iftGetVoxelIndex(bin[i],u);
     	  bin[i]->val[p]=255;
     	}
@@ -534,7 +539,7 @@ void WriteResults(iftFileSet *fileSet, iftImage **bin)
     char filename[200];
     iftSList *list = iftSplitString(fileSet->files[i]->path,"_");
     iftSNode *L    = list->tail;
-    sprintf(filename,"result_%s.png",L->elem);
+    sprintf(filename,"result_%s",L->elem);
     iftDrawBorders(img,bin[i],A,YCbCr,B);
     iftWriteImageByExt(img,filename);
     iftDestroyImage(&img);
