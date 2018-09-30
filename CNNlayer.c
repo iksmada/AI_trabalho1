@@ -240,7 +240,7 @@ iftMatrix *ConvolutionByMatrixMult(iftMatrix *Ximg, iftMatrix *W) {
 
 /* Convert an image matrix into a multi-band image */
 
-iftMImage *MatrixToMImage(iftMatrix *Ximg, xsize, ysize, zsize) {
+iftMImage *MatrixToMImage(iftMatrix *Ximg, int xsize, int ysize, int zsize) {
 
     iftMImage *m_img;
     m_img = iftCreateMImage(xsize, ysize, zsize, Ximg->nrows);
