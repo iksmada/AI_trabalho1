@@ -1,7 +1,7 @@
 FLAGS = -fPIC -std=gnu11 -Wall -Wno-unused-result -pedantic
 CC = gcc
 BIN = ./bin
-.DEFAULT_GOAL := CNNlayer
+.DEFAULT_GOAL := srcs
 
 LIBSVM_DIR = ./externals/libsvm
 LIBNIFTI_DIR= ./externals/libnifti
@@ -44,6 +44,7 @@ ifeq ($(IFT_GPU), 1)
 endif
 
 
+srcs: CNNlayer testing training
 
 $@.c: $@.c
 	$(CC) $(FLAGS) $@.c -o $(BIN)/$@ $(INCLUDES) $(LIBS)
