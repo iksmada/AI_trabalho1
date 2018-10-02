@@ -1,4 +1,3 @@
-#include "ift.h"
 #include "neural_net.c"
 
 iftImage *ReadMaskImage(char *pathname) {
