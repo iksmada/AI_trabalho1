@@ -348,16 +348,10 @@ void FindBestKernelWeights(iftMImage **mimg, iftImage **masks, int nimages, NetP
     printf("%s", "FindBestKernelWeights\n");
     float *w = nparam->weight;
     int bands = mimg[0]->m; // same as nkernels
-    float kernel_errors[bands];
-    for (int e=0; e<bands;e++){
-        kernel_errors[e] = 0.0;
-    }
+    float *kernel_errors = iftAllocFloatArray(bands);
 
     for (int b = 0; b < bands; b++) {
-        float threshold_errors[MAX_THRESHOLD];
-        for (int e=0; e<MAX_THRESHOLD;e++){
-            threshold_errors[e] = 0.0;
-        }
+        float *threshold_errors = iftAllocFloatArray(MAX_THRESHOLD);
         for (int i = 0; i < nimages; i++){
             iftMImage *images_bank = mimg[i];
             iftImage *mask = masks[i];
