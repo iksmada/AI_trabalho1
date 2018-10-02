@@ -324,7 +324,6 @@ void NormalizeActivationValues(iftMImage **mimg, int nimages, int maxval, NetPar
 
     for (int i = 0; i < nimages; i++) { /* For each image */
         for (int b = 0; b < mimg[i]->m; b++) { /* For each band */
-            maxactiv[b] = 0.0;
             for (int p = 0; p < mimg[i]->n; p++) { /* Find the maximum
   						activation value */
                 if (mimg[i]->band[b].val[p] > maxactiv[b])
