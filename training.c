@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
 
     cbands = CombineBands(mimg, trainSet->n, nparam->weight);
     RemoveActivationsOutOfRegionOfPlates(cbands, trainSet->n, nparam);
-    FindBestThreshold(cbands, mask, trainSet->n, nparam);
+    FindBestThreshold(cbands, mask, trainSet->n, nparam, 0);
 
     WriteNetParameters(nparam, argv[3]);
     iftImage **bin = ApplyThreshold(cbands, trainSet->n, nparam);
