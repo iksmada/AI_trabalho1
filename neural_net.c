@@ -390,6 +390,7 @@ void FindBestKernelWeights(iftMImage **mimg, iftImage **masks, int nimages, NetP
         // find argmax
         int argmin = iftArgmin((const int *) threshold_errors, MAX_THRESHOLD);
         kernel_errors[b] = threshold_errors[argmin]/100.0f;
+        if (threshold_errors != NULL) iftFree(threshold_errors);
 
         /* TODO IT
          * save thresholds to NetParam and apply it in test as well
@@ -403,6 +404,7 @@ void FindBestKernelWeights(iftMImage **mimg, iftImage **masks, int nimages, NetP
     for (int i =0; i < bands; i++){
         w[i] = 1-(kernel_errors[i]/sum);
     }
+    if (kernel_errors != NULL) iftFree(kernel_errors);
 
 
     iftUnitNorm(w, bands);
@@ -482,6 +484,7 @@ void FindBestThreshold(iftMImage **mimg, iftImage **masks, int nimages, NetParam
 
     // find argmin
     nparam->threshold = iftArgmin((const int *) threshold_errors, MAX_THRESHOLD)+1;
+    if (threshold_errors != NULL) iftFree(threshold_errors);
 
     /*
     // change original image for best thresold
