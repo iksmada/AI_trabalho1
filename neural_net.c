@@ -568,11 +568,12 @@ void PostProcess(iftImage **bin, int nimages, NetParameters *nparam) {
         uf.x = iftMin(bin[i]->xsize - 1, xcenter + nparam->mean_width / 2 + 25);
         uf.y = iftMin(bin[i]->ysize - 1, ycenter + nparam->mean_height / 2 + 25);
 
-        for (u.y = uo.y; u.y <= uf.y; u.y++)
-            for (u.x = uo.x; u.x <= uf.x; u.x++) {
-                int p = iftGetVoxelIndex(bin[i], u);
-                bin[i]->val[p] = 255;
-            }
+        if (uo.x != 0 && uo.y != 0)
+            for (u.y = uo.y; u.y <= uf.y; u.y++)
+                for (u.x = uo.x; u.x <= uf.x; u.x++) {
+                    int p = iftGetVoxelIndex(bin[i], u);
+                    bin[i]->val[p] = 255;
+                }
     }
 
     iftDestroyAdjRel(&A);
