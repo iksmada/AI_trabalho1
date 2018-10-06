@@ -47,7 +47,7 @@ endif
 srcs: CNNlayer testing training
 
 $@.c: $@.c
-	$(CC) $(FLAGS) $@.c -o $(BIN)/$@ $(INCLUDES) $(LIBS)
+	$(CC) $(FLAGS) $@.c -O3 -o $(BIN)/$@ $(INCLUDES) $(LIBS)
 
 
 clean:
