@@ -344,6 +344,40 @@ void NormalizeActivationValues(iftMImage **mimg, int nimages, int maxval, NetPar
     }
 }
 
+
+int *FindThresholdErrors(iftMImage *const *mimg, iftImage *const *masks, int nimages, int b) {
+    int *threshold_errors = iftAllocIntArray(MAX_THRESHOLD);
+    for (int i = 0; i < nimages; i++){
+        iftMImage *images_bank = mimg[i];
+        iftImage *mask = masks[i];
+        iftImage *image_conv = iftMImageToImage(images_bank,255,b);
+        for (int threshold =1; threshold <=MAX_THRESHOLD; threshold++) {
+            iftImage *image_bin = iftThreshold(image_conv, threshold, 255, 1);
+            int false_positive = 0, false_negative = 0;
+
+            //iterate image and count errors
+            for (int p = 0; p < image_bin->n; p++) {
+                int ground_truth = mask->val[p];
+                int pixel = image_bin->val[p];
+
+                //calculate error
+                if (ground_truth == 0 && pixel == 1) {
+                    false_positive++;
+                }
+                else if (ground_truth == 255 && pixel == 0){
+                    false_negative++;
+                }
+            }
+            iftDestroyImage(&image_bin);
+
+            //computate the error
+            threshold_errors[threshold-1] += false_positive + FALSE_NEGATIVE_CONST * false_negative;
+        }
+        iftDestroyImage(&image_conv);
+    }
+    return threshold_errors;
+}
+
 void FindBestKernelWeights(iftMImage **mimg, iftImage **masks, int nimages, NetParameters *nparam) {
     printf("%s", "FindBestKernelWeights\n");
     float *w = nparam->weight;
@@ -351,43 +385,16 @@ void FindBestKernelWeights(iftMImage **mimg, iftImage **masks, int nimages, NetP
     float *kernel_errors = iftAllocFloatArray(bands);
 
     for (int b = 0; b < bands; b++) {
-        float *threshold_errors = iftAllocFloatArray(MAX_THRESHOLD);
-        for (int i = 0; i < nimages; i++){
-            iftMImage *images_bank = mimg[i];
-            iftImage *mask = masks[i];
-            iftImage *image_conv = iftMImageToImage(images_bank,255,b);
-            for (int threshold =1; threshold <=MAX_THRESHOLD; threshold++) {
-                iftImage *image_bin = iftThreshold(image_conv, threshold, 255, 1);
-                int false_positive = 0, false_negative = 0;
-
-                //iterate image and count errors
-                for (int p = 0; p < image_bin->n; p++) {
-                    int ground_truth = mask->val[p];
-                    int pixel = image_bin->val[p];
-
-                    //calculate error
-                    if (ground_truth == 0 && pixel == 1) {
-                        false_positive++;
-                    }
-                    else if (ground_truth == 255 && pixel == 0){
-                        false_negative++;
-                    }
-                }
-                iftDestroyImage(&image_bin);
-
-                //computate the error
-                threshold_errors[threshold-1] += false_positive + FALSE_NEGATIVE_CONST * false_negative;
-            }
-            iftDestroyImage(&image_conv);
-        }
+        int *threshold_errors = FindThresholdErrors(mimg, masks, nimages, b);
 
         // find argmax
-        //int argmax = iftArgmin((const int *) threshold_errors, MAX_THRESHOLD);
-        kernel_errors[b] = iftMinFloatArray(threshold_errors, MAX_THRESHOLD)/100.0f;
+        int argmin = iftArgmin((const int *) threshold_errors, MAX_THRESHOLD);
+        kernel_errors[b] = threshold_errors[argmin]/100.0f;
 
-        /*
+        /* TODO IT
+         * save thresholds to NetParam and apply it in test as well
         // change original image for best thresold
-        iftBand band = iftImageToMImage(iftThreshold(image_conv, argmax+1, 255, 1), GRAY_CSPACE)->band[0];
+        iftBand band = iftImageToMImage(iftThreshold(image_conv, argmin+1, 255, 1), GRAY_CSPACE)->band[0];
         images_bank->band[b] = band;
          */
     }
@@ -471,39 +478,7 @@ iftMImage **CombineBands(iftMImage **mimg, int nimages, float *weight) {
 void FindBestThreshold(iftMImage **mimg, iftImage **masks, int nimages, NetParameters *nparam, int band) {
     printf("%s", "FindBestThreshold\n");
 
-    int threshold_errors[MAX_THRESHOLD];
-    for (int e=0; e<MAX_THRESHOLD;e++){
-        threshold_errors[e] = 0;
-    }
-    for (int i = 0; i < nimages; i++){
-        iftMImage *images_bank = mimg[i];
-        iftImage *mask = masks[i];
-        int min,max;
-        iftMinMaxValue(mask,&min,&max);
-        iftImage *image_conv = iftMImageToImage(images_bank,255,band);
-        for (int threshold =1; threshold <=MAX_THRESHOLD; threshold++) {
-            iftImage *image_bin = iftThreshold(image_conv, threshold, 255, 1);
-            int false_positive = 0, false_negative = 0;
-            //iterate image and count errors
-            for (int p = 0; p < image_bin->n; p++) {
-                int ground_truth = mask->val[p];
-                int pixel = image_bin->val[p];
-
-                //calculate error
-                if (ground_truth == 0 && pixel == 1) {
-                    false_positive++;
-                }
-                else if (ground_truth == 255 && pixel == 0){
-                    false_negative++;
-                }
-            }
-            iftDestroyImage(&image_bin);
-
-            //computate the error
-            threshold_errors[threshold-1] += false_positive + FALSE_NEGATIVE_CONST * false_negative;
-        }
-        iftDestroyImage(&image_conv);
-    }
+    int *threshold_errors = FindThresholdErrors(mimg, masks, nimages, band);
 
     // find argmin
     nparam->threshold = iftArgmin((const int *) threshold_errors, MAX_THRESHOLD)+1;
