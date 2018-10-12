@@ -319,7 +319,7 @@ void ComputeAspectRatioParameters(iftImage **mask, int nimages, NetParameters *n
     nparam->mean_height /= nimages;
 }
 
-void NormalizeActivationValues(iftMImage **mimg, int nimages, int maxval, NetParameters *nparam) {
+iftMImage **NormalizeActivationValues(iftMImage **mimg, int nimages, int maxval, NetParameters *nparam) {
     float *maxactiv = nparam->maxactiv;
 
     for (int i = 0; i < nimages; i++) { /* For each image */
@@ -332,16 +332,20 @@ void NormalizeActivationValues(iftMImage **mimg, int nimages, int maxval, NetPar
         }
     }
 
+    iftMImage **norm_img = (iftMImage **) calloc(nimages, sizeof(iftMImage *));
     for (int i = 0; i < nimages; i++) { /* For each image */
+        norm_img[i] = iftCreateMImage(mimg[i]->xsize,mimg[i]->ysize,mimg[i]->zsize,mimg[i]->m);
         for (int b = 0; b < mimg[i]->m; b++) { /* For each band */
             if (maxactiv[b] > 0.0) {
                 for (int p = 0; p < mimg[i]->n; p++) { /* Normalize activation values */
-                    mimg[i]->band[b].val[p] = maxval * mimg[i]->band[b].val[p] / maxactiv[b];
+                    norm_img[i]->band[b].val[p] = maxval * mimg[i]->band[b].val[p] /  maxactiv[b];
 
                 }
             }
         }
     }
+
+    return norm_img;
 }
 
 

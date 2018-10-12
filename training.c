@@ -13,7 +13,7 @@ iftImage *ReadMaskImage(char *pathname) {
 
 int main(int argc, char *argv[]) {
     iftImage **mask;
-    iftMImage **mimg, **cbands;
+    iftMImage **mimg, **cbands, **norm_img;
 
     if (argc != 4)
         iftError("training <trainX.txt (X=1,2,3,4,5)> <kernel-bank.txt> <output-parameters.txt>", "main");
@@ -44,15 +44,15 @@ int main(int argc, char *argv[]) {
     ComputeAspectRatioParameters(mask, trainSet->n, nparam);
     RegionOfPlates(mask, trainSet->n, nparam);
     //RemoveActivationsOutOfRegionOfPlates(mimg, trainSet->n, nparam);
-    NormalizeActivationValues(mimg, trainSet->n, 255, nparam);
+    norm_img = NormalizeActivationValues(mimg, trainSet->n, 255, nparam);
 
     /* Find the best kernel weights */
+    FindBestKernelWeights(norm_img, mask, trainSet->n, nparam);
 
     FindBestKernelWeights(mimg, mask, trainSet->n, nparam);
 
     /* Combine bands, find optimum threshold, and apply it */
-
-    cbands = CombineBands(mimg, trainSet->n, nparam->weight);
+    cbands = CombineBands(norm_img, trainSet->n, nparam->weight);
     RemoveActivationsOutOfRegionOfPlates(cbands, trainSet->n, nparam);
     FindBestThreshold(cbands, mask, trainSet->n, nparam, 0);
 
@@ -71,11 +71,13 @@ int main(int argc, char *argv[]) {
         iftDestroyImage(&bin[i]);
         iftDestroyMImage(&cbands[i]);
         iftDestroyMImage(&mimg[i]);
+        iftDestroyMImage(&norm_img[i]);
     }
     iftFree(mask);
     iftFree(mimg);
     iftFree(bin);
     iftFree(cbands);
+    iftFree(norm_img);
     iftDestroyFileSet(&trainSet);
     DestroyMKernelBank(&Kbank);
     DestroyNetParameters(&nparam);
