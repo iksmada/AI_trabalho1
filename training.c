@@ -49,7 +49,8 @@ int main(int argc, char *argv[]) {
     /* Find the best kernel weights */
     FindBestKernelWeights(norm_img, mask, trainSet->n, nparam);
 
-    FindBestKernelWeights(mimg, mask, trainSet->n, nparam);
+    /* Normalize each image */
+    //NormalizeImage(mimg, trainSet->n, 255);
 
     /* Combine bands, find optimum threshold, and apply it */
     cbands = CombineBands(norm_img, trainSet->n, nparam->weight);

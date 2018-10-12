@@ -1,3 +1,4 @@
+#include <values.h>
 #include "ift.h"
 
 #define MAX_THRESHOLD 255
@@ -609,3 +610,22 @@ void WriteResults(iftFileSet *fileSet, iftImage **bin) {
     iftDestroyAdjRel(&B);
 }
 
+void NormalizeImage(iftMImage **mimg, int nimages, int maxval) {
+    float maxactiv = MINFLOAT;
+
+    for (int i = 0; i < nimages; i++) { /* For each image */
+        for (int b = 0; b < mimg[i]->m; b++) { /* For each band */
+            for (int p = 0; p < mimg[i]->n; p++) { /* Find the maximum
+  						activation value */
+                if (mimg[i]->band[b].val[p] > maxactiv)
+                    maxactiv = mimg[i]->band[b].val[p];
+            }
+            if (maxactiv > 0.0) {
+                for (int p = 0; p < mimg[i]->n; p++) { /* Normalize activation values */
+                    mimg[i]->band[b].val[p] = maxval * mimg[i]->band[b].val[p] / maxactiv;
+
+                }
+            }
+        }
+    }
+}
