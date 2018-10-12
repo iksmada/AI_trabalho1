@@ -540,14 +540,15 @@ void SelectCompClosestTotheMeanWidthAndHeight(iftImage *label, float mean_width,
 
 void PostProcess(iftImage **bin, int nimages, NetParameters *nparam) {
     iftAdjRel *A = iftCircular(sqrtf(2.0));
+    iftAdjRel *rec_big = iftRectangular(12,5);
 
     for (int i = 0; i < nimages; i++) {
         iftImage *aux[2];
         iftSet *S = NULL;
         aux[0] = iftAddFrame(bin[i], 15, 0);
-        aux[1] = iftErodeBin(aux[0], &S, 8.0);
+        aux[1] = iftDilate(aux[0], rec_big, NULL);
         iftDestroyImage(&aux[0]);
-        aux[0] = iftDilateBin(aux[1], &S, 10.0);
+        aux[0] = iftDilateBin(aux[1], &S, 5.0);
         iftDestroyImage(&aux[1]);
         aux[1] = iftErodeBin(aux[0], &S, 5.0);
         iftDestroyImage(&aux[0]);
@@ -582,6 +583,7 @@ void PostProcess(iftImage **bin, int nimages, NetParameters *nparam) {
     }
 
     iftDestroyAdjRel(&A);
+    iftDestroyAdjRel(&rec_big);
 }
 
 void WriteResults(iftFileSet *fileSet, iftImage **bin) {
