@@ -569,12 +569,12 @@ void PostProcess(iftImage **bin, int nimages, NetParameters *nparam) {
         int xcenter = bb.begin.x + xsize / 2;
         int ycenter = bb.begin.y + ysize / 2;
 
-        uo.x = iftMax(0, xcenter - iftRound(nparam->mean_width / 2) - 25);
-        uo.y = iftMax(0, ycenter - iftRound(nparam->mean_height / 2) - 25);
-        uf.x = iftMin(bin[i]->xsize - 1, xcenter + iftRound(nparam->mean_width / 2) + 25);
-        uf.y = iftMin(bin[i]->ysize - 1, ycenter + iftRound(nparam->mean_height / 2) + 25);
+        uo.x = iftMax(2, xcenter - iftRound(nparam->mean_width / 2) - 25);
+        uo.y = iftMax(2, ycenter - iftRound(nparam->mean_height / 2) - 25);
+        uf.x = iftMin(bin[i]->xsize - 3, xcenter + iftRound(nparam->mean_width / 2) + 25);
+        uf.y = iftMin(bin[i]->ysize - 3, ycenter + iftRound(nparam->mean_height / 2) + 25);
 
-        if (uo.x != 0 && uo.y != 0)
+        if (uo.x != 0 || uo.y != 0)
             for (u.y = uo.y; u.y <= uf.y; u.y++)
                 for (u.x = uo.x; u.x <= uf.x; u.x++) {
                     int p = iftGetVoxelIndex(bin[i], u);
