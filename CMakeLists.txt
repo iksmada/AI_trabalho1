@@ -25,6 +25,7 @@ set (TSNE_DIR "externals/tsne")
 
 add_executable(CNNlayer CNNlayer.c)
 add_executable(training training.c)
+add_executable(testing testing.c)
 
 include_directories (
         "${LIBSVM_DIR}/include"

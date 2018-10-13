@@ -14,7 +14,7 @@ iftImage *ReadMaskImage(char *pathname) {
 
 int main(int argc, char *argv[]) {
     iftImage **mask;
-    iftMImage **mimg, **cbands;
+    iftMImage **mimg, **cbands, **norm_img;
     NetParameters *nparam;
 
     if (argc != 4)
@@ -41,11 +41,11 @@ int main(int argc, char *argv[]) {
     /* Normalize activation values within [0,255] */
 
     //RemoveActivationsOutOfRegionOfPlates(mimg, testSet->n, nparam);
-    NormalizeActivationValues(mimg, testSet->n, 255, nparam);
+    norm_img = NormalizeActivationValues(mimg, testSet->n, 255, nparam);
 
     /* Combine bands */
 
-    cbands = CombineBands(mimg, testSet->n, nparam->weight);
+    cbands = CombineBands(norm_img, testSet->n, nparam->weight);
     RemoveActivationsOutOfRegionOfPlates(cbands, testSet->n, nparam);
 
     iftImage **bin = ApplyThreshold(cbands, testSet->n, nparam);
@@ -62,11 +62,14 @@ int main(int argc, char *argv[]) {
         iftDestroyImage(&bin[i]);
         iftDestroyMImage(&cbands[i]);
         iftDestroyMImage(&mimg[i]);
+        iftDestroyMImage(&norm_img[i]);
+
     }
     iftFree(mask);
     iftFree(mimg);
     iftFree(bin);
     iftFree(cbands);
+    iftFree(norm_img);
     iftDestroyFileSet(&testSet);
     DestroyMKernelBank(&Kbank);
     DestroyNetParameters(&nparam);
