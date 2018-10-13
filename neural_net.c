@@ -540,7 +540,7 @@ void SelectCompClosestTotheMeanWidthAndHeight(iftImage *label, float mean_width,
 
 void PostProcess(iftImage **bin, int nimages, NetParameters *nparam) {
     iftAdjRel *A = iftCircular(sqrtf(2.0));
-    iftAdjRel *rec_big = iftRectangular(12,5);
+    iftAdjRel *rec_big = iftRectangular(17,5);
 
     for (int i = 0; i < nimages; i++) {
         iftImage *aux[2];
