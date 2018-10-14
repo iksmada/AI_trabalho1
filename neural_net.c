@@ -601,7 +601,7 @@ void WriteResults(iftFileSet *fileSet, iftImage **bin) {
         char filename[200];
         iftSList *list = iftSplitString(fileSet->files[i]->path, "_");
         iftSNode *L = list->tail;
-        sprintf(filename, "result_%s", L->elem);
+        sprintf(filename, "results/result_%s", L->elem);
         iftDrawBorders(img, bin[i], A, YCbCr, B);
         iftWriteImageByExt(img, filename);
         iftDestroyImage(&img);
