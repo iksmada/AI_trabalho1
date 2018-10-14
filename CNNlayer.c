@@ -244,10 +244,8 @@ iftMImage *MatrixToMImage(iftMatrix *Ximg, int xsize, int ysize, int zsize) {
 
     iftMImage *m_img;
     m_img = iftCreateMImage(xsize, ysize, zsize, Ximg->nrows);
-
-    for (int p = 0; p < m_img->n; p++) {
-        iftVoxel u = iftMGetVoxelCoord(m_img, p);
-        for (int b = 0; b < m_img->m; b++) {
+    for (int b = 0; b < m_img->m; b++) {
+        for (int p = 0; p < m_img->n; p++) {
             m_img->band[b].val[p] = iftMatrixElem(Ximg, p, b);
         }
     }
