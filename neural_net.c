@@ -349,6 +349,47 @@ iftMImage **NormalizeActivationValues(iftMImage **mimg, int nimages, int maxval,
     return norm_img;
 }
 
+float *CompareImages(iftImage *const *bins, iftImage *const *masks, int nimages) {
+    float *recall = iftAllocFloatArray(nimages);
+    for (int i = 0; i < nimages; i++){
+        iftImage *bin = bins[i];
+        iftImage *mask = masks[i];
+        int true_positive = 0, false_negative = 0;
+
+        //iterate image and count errors
+        for (int p = 0; p < bin->n; p++) {
+            int ground_truth = mask->val[p];
+            int pixel = bin->val[p];
+
+            //calculate error
+            if (ground_truth == 255){
+                if (pixel == 255)
+                    true_positive++;
+                else
+                    false_negative++;
+            }
+        }
+
+        //computate the error
+        recall[i] = true_positive / (float) (true_positive + false_negative);
+
+    }
+    return recall;
+}
+
+void ComputeStats(float *recall, long n) {
+    iftPrintFloatArray(recall, n);
+    int hit =0, miss =0;
+    for (int i = 0; i < n; i++){
+        if (recall[i] > 0.8)
+            hit++;
+        else
+            miss++;
+    }
+    printf("Hit: %d Miss: %d\n", hit, miss);
+
+}
+
 
 int *FindThresholdErrors(iftMImage *const *mimg, iftImage *const *masks, int nimages, int b) {
     int *threshold_errors = iftAllocIntArray(MAX_THRESHOLD);

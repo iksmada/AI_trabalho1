@@ -68,6 +68,9 @@ int main(int argc, char *argv[]) {
     PostProcess(bin, trainSet->n, nparam, debug);
     WriteResults(trainSet, bin, debug);
 
+    float * recall = CompareImages(bin, mask, trainSet->n);
+    ComputeStats(recall, trainSet->n);
+
     /* Free memory */
 
     for (int i = 0; i < trainSet->n; i++) {
