@@ -15,10 +15,12 @@ iftImage *ReadMaskImage(char *pathname) {
 int main(int argc, char *argv[]) {
     iftImage **mask;
     iftMImage **mimg, **cbands, **norm_img;
+    bool debug = false;
 
-    if (argc != 4)
+    if (argc < 4)
         iftError("training <trainX.txt (X=1,2,3,4,5)> <kernel-bank.txt> <output-parameters.txt>", "main");
-
+    else if (argc > 4)
+        debug = iftCompareStrings("--debug", argv[4]);
     /* Read input images and kernel bank */
 
     iftFileSet *trainSet = iftLoadFileSetFromCSV(argv[1], false);
@@ -63,8 +65,8 @@ int main(int argc, char *argv[]) {
 
     /* Post-process binary images and write results on training set */
 
-    PostProcess(bin, trainSet->n, nparam);
-    WriteResults(trainSet, bin);
+    PostProcess(bin, trainSet->n, nparam, debug);
+    WriteResults(trainSet, bin, debug);
 
     /* Free memory */
 

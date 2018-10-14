@@ -539,19 +539,32 @@ void SelectCompClosestTotheMeanWidthAndHeight(iftImage *label, float mean_width,
 }
 
 
-void PostProcess(iftImage **bin, int nimages, NetParameters *nparam) {
+void PostProcess(iftImage **bin, int nimages, NetParameters *nparam, bool debug) {
     iftAdjRel *A = iftCircular(sqrtf(2.0));
     iftAdjRel *rec_big = iftRectangular(17,5);
 
     for (int i = 0; i < nimages; i++) {
+        char filename[200];
         iftImage *aux[2];
         iftSet *S = NULL;
         aux[0] = iftAddFrame(bin[i], 15, 0);
+        sprintf(filename, "result_%d1.png", i);
+        if (debug)
+            iftWriteImageByExt(aux[0], filename);
         aux[1] = iftDilate(aux[0], rec_big, NULL);
+        sprintf(filename, "result_%d2.png", i);
+        if (debug)
+            iftWriteImageByExt(aux[1], filename);
         iftDestroyImage(&aux[0]);
         aux[0] = iftDilateBin(aux[1], &S, 5.0);
+        sprintf(filename, "result_%d3.png", i);
+        if (debug)
+            iftWriteImageByExt(aux[0], filename);
         iftDestroyImage(&aux[1]);
         aux[1] = iftErodeBin(aux[0], &S, 5.0);
+        sprintf(filename, "result_%d4.png", i);
+        if (debug)
+            iftWriteImageByExt(aux[1], filename);
         iftDestroyImage(&aux[0]);
         aux[0] = iftRemFrame(aux[1], 15);
         iftDestroyImage(&aux[1]);
@@ -589,7 +602,7 @@ void PostProcess(iftImage **bin, int nimages, NetParameters *nparam) {
     iftDestroyAdjRel(&rec_big);
 }
 
-void WriteResults(iftFileSet *fileSet, iftImage **bin) {
+void WriteResults(iftFileSet *fileSet, iftImage **bin, bool debug) {
     iftColor RGB, YCbCr;
     iftAdjRel *A = iftCircular(1.0), *B = iftCircular(sqrtf(2.0));
 
@@ -604,7 +617,10 @@ void WriteResults(iftFileSet *fileSet, iftImage **bin) {
         char filename[200];
         iftSList *list = iftSplitString(fileSet->files[i]->path, "_");
         iftSNode *L = list->tail;
-        sprintf(filename, "results/result_%s", L->elem);
+        if (debug)
+            sprintf(filename, "result_%d9", i);
+        else
+            sprintf(filename, "results/result_%s", L->elem);
         iftDrawBorders(img, bin[i], A, YCbCr, B);
         iftWriteImageByExt(img, filename);
         iftDestroyImage(&img);

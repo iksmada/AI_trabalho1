@@ -16,10 +16,12 @@ int main(int argc, char *argv[]) {
     iftImage **mask;
     iftMImage **mimg, **cbands, **norm_img;
     NetParameters *nparam;
+    bool debug = false;
 
-    if (argc != 4)
+    if (argc < 4)
         iftError("testing <testX.txt (X=1,2,3,4,5)> <kernel-bank.txt> <input-parameters.txt>", "main");
-
+    else if (argc > 4)
+        debug = iftCompareStrings("--debug", argv[4]);
     /* Read input images and kernel bank */
 
     iftFileSet *testSet = iftLoadFileSetFromCSV(argv[1], false);
@@ -52,8 +54,8 @@ int main(int argc, char *argv[]) {
 
     /* Post-process binary images and write results on training set */
 
-    PostProcess(bin, testSet->n, nparam);
-    WriteResults(testSet, bin);
+    PostProcess(bin, testSet->n, nparam, debug);
+    WriteResults(testSet, bin, debug);
 
     /* Free memory */
 
