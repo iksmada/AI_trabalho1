@@ -674,7 +674,7 @@ void WriteResults(iftFileSet *fileSet, iftImage **bin, bool debug) {
 
 void NormalizeImage(iftMImage **mimg, int nimages, int maxval) {
     float maxactiv = MINFLOAT;
-
+#pragma omp parallel for
     for (int i = 0; i < nimages; i++) { /* For each image */
         for (int b = 0; b < mimg[i]->m; b++) { /* For each band */
             for (int p = 0; p < mimg[i]->n; p++) { /* Find the maximum
