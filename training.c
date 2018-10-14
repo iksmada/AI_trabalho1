@@ -1,4 +1,5 @@
 #include "neural_net.c"
+#include "omp.h"
 
 iftImage *ReadMaskImage(char *pathname) {
     iftImage *mask = NULL;
@@ -26,7 +27,7 @@ int main(int argc, char *argv[]) {
     MKernelBank *Kbank = ReadMKernelBank(argv[2]);
 
     /* Apply the single-layer NN in all training images */
-
+#pragma omp parallel for
     for (int i = 0; i < trainSet->n; i++) {
         printf("Processing file %s\n", trainSet->files[i]->path);
         iftImage *img = iftReadImageByExt(trainSet->files[i]->path);

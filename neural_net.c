@@ -352,6 +352,7 @@ iftMImage **NormalizeActivationValues(iftMImage **mimg, int nimages, int maxval,
 
 int *FindThresholdErrors(iftMImage *const *mimg, iftImage *const *masks, int nimages, int b) {
     int *threshold_errors = iftAllocIntArray(MAX_THRESHOLD);
+#pragma omp parallel for
     for (int i = 0; i < nimages; i++){
         iftMImage *images_bank = mimg[i];
         iftImage *mask = masks[i];
