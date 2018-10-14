@@ -226,7 +226,22 @@ MatrixInfo *ReadMKernelBank(char *filename) {
    matrix */
 
 iftMatrix *MImageToMatrix(iftMImage *mult_img, iftAdjRel *A) {
-    return (NULL);
+    iftMatrix *x_img;
+    x_img = iftCreateMatrix(mult_img->n, A->n + mult_img->m);
+    for (int p = 0; p < mult_img->n; p++) {
+        for (int b = 0; b < mult_img->m; b++) {
+        iftMatrixElem(x_img, p, b) = mult_img->band[b].val[p];
+            iftVoxel u = iftMGetVoxelCoord(mult_img, p);
+            for (int i = 1; i < A->n; i++) {
+                iftVoxel v = iftGetAdjacentVoxel(A, u, i);
+                //if (iftMValidVoxel(mult_img, v))
+                int q = iftMGetVoxelIndex(mult_img, v);
+                iftMatrixElem(x_img, p, b + i*mult_img->m) = mult_img->band[b].val[q];
+            }
+        }
+    }
+
+    return (x_img);
 }
 
 /* Extend a multi-band image to include the adjacent values in a same
