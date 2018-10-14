@@ -9,11 +9,13 @@ import numpy as np
 
 parser = argparse.ArgumentParser(description='Read kernel bank or file, with indexes in first line')
 parser.add_argument('-s', '--split-dir', type=str, help='splits path', default='split')
+parser.add_argument('-k', '--kernel-dir', type=str, help='kelnels path', default='.')
 
 args = vars(parser.parse_args())
 print(args)
 
 SPLIT = args["split_dir"]
+KERNEL = args["kernel_dir"]
 
 splits = set()
 for file in os.listdir(SPLIT):
@@ -34,7 +36,7 @@ def parse(lines):
 
 subprocess.run(["make", "srcs"])
 
-for kernel in os.listdir('.'):
+for kernel in os.listdir(KERNEL):
     if os.path.isfile(kernel) and kernel.startswith("kernel-bank"):
         scores = []
         print("Running 5x2 CV on %s" % kernel)
