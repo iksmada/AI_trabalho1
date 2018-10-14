@@ -583,7 +583,7 @@ void SelectCompClosestTotheMeanWidthAndHeight(iftImage *label, float mean_width,
 void PostProcess(iftImage **bin, int nimages, NetParameters *nparam, bool debug) {
     iftAdjRel *A = iftCircular(sqrtf(2.0));
     iftAdjRel *rec_big = iftRectangular(17,5);
-
+#pragma omp parallel for
     for (int i = 0; i < nimages; i++) {
         char filename[200];
         iftImage *aux[2];

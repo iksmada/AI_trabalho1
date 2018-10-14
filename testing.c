@@ -31,7 +31,7 @@ int main(int argc, char *argv[]) {
     nparam = ReadNetParameters(argv[3]);
 
     /* Apply NN in all test images */
-
+#pragma omp parallel for
     for (int i = 0; i < testSet->n; i++) {
         printf("Processing file %s\n", testSet->files[i]->path);
         iftImage *img = iftReadImageByExt(testSet->files[i]->path);
