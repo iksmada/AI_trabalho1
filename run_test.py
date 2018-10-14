@@ -32,6 +32,8 @@ def parse(lines):
             return hit / (hit + miss)
 
 
+subprocess.run(["make", "srcs"])
+
 for kernel in os.listdir('.'):
     if os.path.isfile(kernel) and kernel.startswith("kernel-bank"):
         scores = []
@@ -51,6 +53,7 @@ for kernel in os.listdir('.'):
             result = subprocess.run(["bin/testing", train, kernel, parameter_path], stdout=subprocess.PIPE)
             scores.append(parse(result.stdout.decode('utf-8')))
 
+        print("")
         scores = np.array(scores)
         print("Accuracy: %0.2f (+/- %0.2f)" % (scores.mean(), scores.std() * 2))
 
