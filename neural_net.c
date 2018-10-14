@@ -556,11 +556,11 @@ void PostProcess(iftImage **bin, int nimages, NetParameters *nparam) {
         iftDestroyImage(&aux[1]);
         iftDestroyImage(&bin[i]);
         iftDestroySet(&S);
-        bin[i] = iftFastLabelComp(aux[0], A);
+        aux[1] = iftFastLabelComp(aux[0], A);
         iftDestroyImage(&aux[0]);
-        SelectCompClosestTotheMeanWidthAndHeight(bin[i], nparam->mean_width, nparam->mean_height);
+        SelectCompClosestTotheMeanWidthAndHeight(aux[1], nparam->mean_width, nparam->mean_height);
         iftVoxel pos, u, uo, uf;
-        iftBoundingBox bb = iftMinBoundingBox(bin[i], &pos);
+        iftBoundingBox bb = iftMinBoundingBox(aux[1], &pos);
 
         u.z = uo.z = uf.z = 0;
 
@@ -571,9 +571,11 @@ void PostProcess(iftImage **bin, int nimages, NetParameters *nparam) {
 
         uo.x = iftMax(2, xcenter - iftRound(nparam->mean_width / 2) - 25);
         uo.y = iftMax(2, ycenter - iftRound(nparam->mean_height / 2) - 25);
-        uf.x = iftMin(bin[i]->xsize - 3, xcenter + iftRound(nparam->mean_width / 2) + 25);
-        uf.y = iftMin(bin[i]->ysize - 3, ycenter + iftRound(nparam->mean_height / 2) + 25);
+        uf.x = iftMin(aux[1]->xsize - 3, xcenter + iftRound(nparam->mean_width / 2) + 25);
+        uf.y = iftMin(aux[1]->ysize - 3, ycenter + iftRound(nparam->mean_height / 2) + 25);
 
+        bin[i] = iftCreateImage(aux[1]->xsize, aux[1]->ysize, aux[1]->zsize);
+        iftDestroyImage(&aux[1]);
         if (uo.x != 0 || uo.y != 0)
             for (u.y = uo.y; u.y <= uf.y; u.y++)
                 for (u.x = uo.x; u.x <= uf.x; u.x++) {
