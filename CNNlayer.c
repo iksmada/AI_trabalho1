@@ -234,9 +234,10 @@ iftMatrix *MImageToMatrix(iftMImage *mult_img, iftAdjRel *A) {
             iftVoxel u = iftMGetVoxelCoord(mult_img, p);
             for (int i = 0; i < A->n; i++) {
                 iftVoxel v = iftGetAdjacentVoxel(A, u, i);
-                //if (iftMValidVoxel(mult_img, v))
-                int q = iftMGetVoxelIndex(mult_img, v);
-                iftMatrixElem(x_img, p, b + i*mult_img->m) = mult_img->band[b].val[q];
+                if (iftMValidVoxel(mult_img, v)) {
+                    int q = iftMGetVoxelIndex(mult_img, v);
+                    iftMatrixElem(x_img, p, b + i * mult_img->m) = mult_img->band[b].val[q];
+                }
             }
         }
         //bias
