@@ -273,7 +273,7 @@ iftMImage *MatrixToMImage(iftMatrix *Ximg, int xsize, int ysize, int zsize) {
 
 }
 
-int main(int argc, char *argv[]) {
+int main2(int argc, char *argv[]) {
     iftImage *orig = NULL, *filt_img = NULL; // integer images
     iftMImage *mult_img = NULL;  // multi-band image
     MKernel *K = NULL; // multi-band kernel
