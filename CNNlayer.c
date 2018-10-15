@@ -206,7 +206,7 @@ iftMImage *Convolution(iftMImage *mult_img, MKernel *K) {
 /* Read file kernel-bank.txt (see ExplicacaoArquivosKernels.txt) and
    return it in a iftMatrix */
 
-MatrixInfo *ReadMKernelBank(char *filename) {
+MatrixInfo *ReadKernelBankAsMatrix(char *filename) {
     FILE *fp = fopen(filename, "r");
     int nbands, xsize, ysize, nkernels;
     iftMatrix *M;
