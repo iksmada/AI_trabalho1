@@ -249,8 +249,10 @@ iftMatrix *MImageToMatrix(iftMImage *mult_img, iftAdjRel *A) {
 
 iftMatrix *ConvolutionByMatrixMult(iftMatrix *Ximg, iftMatrix *W) {
 
+    iftMatrix * m_img;
+    m_img = iftMultMatrices(W,Ximg);
 
-    return (NULL);
+    return (m_img);
 }
 
 /* Convert an image matrix into a multi-band image */
