@@ -44,7 +44,7 @@ ifeq ($(IFT_GPU), 1)
 endif
 
 
-srcs: CNNlayer testing training
+srcs: testing training
 
 $@.c: $@.c
 	$(CC) $(FLAGS) $@.c -o $(BIN)/$@ $(INCLUDES) $(LIBS)
