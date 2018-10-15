@@ -227,18 +227,20 @@ MatrixInfo *ReadKernelBankAsMatrix(char *filename) {
 
 iftMatrix *MImageToMatrix(iftMImage *mult_img, iftAdjRel *A) {
     iftMatrix *x_img;
-    x_img = iftCreateMatrix(mult_img->n, A->n + mult_img->m);
+    // sum bias in rows
+    x_img = iftCreateMatrix(mult_img->n, A->n + 1);
     for (int p = 0; p < mult_img->n; p++) {
         for (int b = 0; b < mult_img->m; b++) {
-            iftMatrixElem(x_img, p, b) = mult_img->band[b].val[p];
             iftVoxel u = iftMGetVoxelCoord(mult_img, p);
-            for (int i = 1; i < A->n; i++) {
+            for (int i = 0; i < A->n; i++) {
                 iftVoxel v = iftGetAdjacentVoxel(A, u, i);
                 //if (iftMValidVoxel(mult_img, v))
                 int q = iftMGetVoxelIndex(mult_img, v);
                 iftMatrixElem(x_img, p, b + i*mult_img->m) = mult_img->band[b].val[q];
             }
         }
+        //bias
+        iftMatrixElem(x_img, p, A->n*mult_img->m) = 1;
     }
 
     return (x_img);
