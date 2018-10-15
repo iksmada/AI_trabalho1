@@ -180,6 +180,45 @@ iftMImage *SingleLayer(iftImage *img, MKernelBank *Kbank) {
     return (out);
 }
 
+iftMImage *SingleLayerMatrix(iftImage *img, MKernelBank *Kbank) {
+
+    iftAdjRel *A[2];
+    iftMImage *aux[2], *mimg, *out;
+    iftMatrix *ximg, *m_kbank, *m_out;
+
+    if (iftIsColorImage(img)) {
+        mimg = iftImageToMImage(img, YCbCr_CSPACE);
+    } else {
+        mimg = iftImageToMImage(img, GRAY_CSPACE);
+    }
+
+    ximg = MImageToMatrix(mimg, Kbank->K[0]->A);
+    m_kbank = MKernelBankToMatrix(Kbank);
+
+    A[0] = iftRectangular(7, 3);
+    A[1] = iftRectangular(9, 9);
+
+    m_out = ConvolutionByMatrixMult(ximg,m_kbank);
+    iftDestroyMatrix(&ximg);
+    iftDestroyMatrix(&m_kbank);
+    aux[0] = MatrixToMImage(m_out,img->xsize, img->ysize, img->zsize);
+
+    aux[1] = ReLu(aux[0]); /* activation */
+    iftDestroyMImage(&aux[0]);
+
+    aux[0] = MaxPooling(aux[1], A[0]);
+    iftDestroyMImage(&aux[1]);
+
+    out = MinPooling(aux[0], A[1]);
+    iftDestroyMImage(&aux[0]);
+
+
+    for (int i = 0; i < 2; i++)
+        iftDestroyAdjRel(&A[i]);
+
+    return (out);
+}
+
 void ComputeAspectRatioParameters(iftImage **mask, int nimages, NetParameters *nparam) {
     nparam->mean_width = 0.0;
     nparam->mean_height = 0.0;
@@ -540,7 +579,7 @@ void WriteResults(iftFileSet *fileSet, iftImage **bin, bool debug) {
         else
             sprintf(filename, "results/result_%s", L->elem);
         iftDrawBorders(img, bin[i], A, YCbCr, B);
-        iftWriteImageByExt(img, filename);
+        //iftWriteImageByExt(img, filename);
         iftDestroyImage(&img);
         iftDestroySList(&list);
     }
