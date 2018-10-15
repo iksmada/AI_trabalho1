@@ -1,17 +1,6 @@
 #include "neural_net.c"
 #include "omp.h"
 
-iftImage *ReadMaskImage(char *pathname) {
-    iftImage *mask = NULL;
-    iftSList *list = iftSplitString(pathname, "_");
-    iftSNode *L = list->tail;
-    char filename[200];
-    sprintf(filename, "./imagens/placas/mask_%s", L->elem);
-    mask = iftReadImageByExt(filename);
-    iftDestroySList(&list);
-    return (mask);
-}
-
 int main(int argc, char *argv[]) {
     iftImage **mask;
     iftMImage **mimg, **cbands, **norm_img;

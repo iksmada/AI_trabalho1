@@ -607,3 +607,14 @@ void NormalizeImage(iftMImage **mimg, int nimages, int maxval) {
         }
     }
 }
+
+iftImage *ReadMaskImage(char *pathname) {
+    iftImage *mask = NULL;
+    iftSList *list = iftSplitString(pathname, "_");
+    iftSNode *L = list->tail;
+    char filename[200];
+    sprintf(filename, "./imagens/placas/mask_%s", L->elem);
+    mask = iftReadImageByExt(filename);
+    iftDestroySList(&list);
+    return (mask);
+}
