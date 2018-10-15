@@ -230,7 +230,7 @@ iftMatrix *MImageToMatrix(iftMImage *mult_img, iftAdjRel *A) {
     x_img = iftCreateMatrix(mult_img->n, A->n + mult_img->m);
     for (int p = 0; p < mult_img->n; p++) {
         for (int b = 0; b < mult_img->m; b++) {
-        iftMatrixElem(x_img, p, b) = mult_img->band[b].val[p];
+            iftMatrixElem(x_img, p, b) = mult_img->band[b].val[p];
             iftVoxel u = iftMGetVoxelCoord(mult_img, p);
             for (int i = 1; i < A->n; i++) {
                 iftVoxel v = iftGetAdjacentVoxel(A, u, i);
