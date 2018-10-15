@@ -114,6 +114,30 @@ void DestroyMKernelBank(MKernelBank **Kbank) {
     *Kbank = NULL;
 }
 
+iftMatrix *MKernelBankToMatrix(MKernelBank *Kbank) {
+    iftMatrix *m_kernel;
+
+    //get info from first kernel (same for all)
+    iftAdjRel *A = Kbank->K[0]->A;
+    int nbands = Kbank->K[0]->nbands;
+
+    // sum bias in cols
+    m_kernel = iftCreateMatrix(A->n * nbands + 1, Kbank->nkernels);
+
+    for (int k = 0; k < Kbank->nkernels; k++) {
+        for (int i = 0; i < A->n; i++) {
+            for (int b = 0; b < nbands; b++) {
+                iftMatrixElem(m_kernel, b + i*nbands, k) = Kbank->K[k]->weight[b].val[i];
+            }
+        }
+        // add bias in end
+        iftMatrixElem(m_kernel, A->n * nbands, k) = Kbank->K[k]->bias;
+    }
+
+    return m_kernel;
+
+}
+
 iftMImage *SingleLayer(iftImage *img, MKernelBank *Kbank) {
     iftMImage *out = iftCreateMImage(img->xsize, img->ysize, img->zsize, Kbank->nkernels);
 
