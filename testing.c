@@ -25,7 +25,7 @@ int main(int argc, char *argv[]) {
         printf("Processing file %s\n", testSet->files[i]->path);
         iftImage *img = iftReadImageByExt(testSet->files[i]->path);
         mask[i] = ReadMaskImage(testSet->files[i]->path);
-        mimg[i] = SingleLayer(img, Kbank);
+        mimg[i] = SingleLayerMatrix(img, Kbank);
         iftDestroyImage(&img);
     }
 

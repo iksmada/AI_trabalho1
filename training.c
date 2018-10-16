@@ -25,7 +25,7 @@ int main(int argc, char *argv[]) {
         mask[i] = ReadMaskImage(trainSet->files[i]->path);
         if ((img->xsize != 352) || (img->ysize != 240))
             printf("imagem %s ", trainSet->files[i]->path);
-        mimg[i] = SingleLayer(img, Kbank);
+        mimg[i] = SingleLayerMatrix(img, Kbank);
         iftDestroyImage(&img);
     }
 
