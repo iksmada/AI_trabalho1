@@ -575,11 +575,11 @@ void WriteResults(iftFileSet *fileSet, iftImage **bin, bool debug) {
         iftSList *list = iftSplitString(fileSet->files[i]->path, "_");
         iftSNode *L = list->tail;
         if (debug)
-            sprintf(filename, "result_%d9", i);
+            sprintf(filename, "result_%d9.png", i);
         else
             sprintf(filename, "results/result_%s", L->elem);
         iftDrawBorders(img, bin[i], A, YCbCr, B);
-        //iftWriteImageByExt(img, filename);
+        iftWriteImageByExt(img, filename);
         iftDestroyImage(&img);
         iftDestroySList(&list);
     }
