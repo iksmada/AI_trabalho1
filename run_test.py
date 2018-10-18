@@ -57,6 +57,6 @@ for kernel in os.listdir(KERNEL):
 
         print("")
         scores = np.array(scores)
-        print("Accuracy: %0.2f (+/- %0.2f)" % (scores.mean(), scores.std() * 2))
+        print("Accuracy: %0.2f (+/- %0.3f)" % (scores.mean(), scores.std()))
 
 
