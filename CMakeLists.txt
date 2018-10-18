@@ -23,7 +23,7 @@ set (TSNE_DIR "externals/tsne")
 #INCLUDES = $(LIBIFT_INC) $(LIBSVM_INC) $(LIBCBLAS_INC) $(LIBNIFTI_INC) $(LIBJPEG_INC) $(TSNE_INC)
 #LIBS     = $(LIBIFT_LD) $(LIBSVM_LD) $(LIBCBLAS_LD) $(EXTERNALS_LD)
 
-add_executable(CNNlayer CNNlayer.c)
+#add_executable(CNNlayer CNNlayer.c)
 add_executable(training training.c)
 add_executable(testing testing.c)
 
@@ -36,5 +36,3 @@ include_directories (
 )
 
 set (EXTRA_LIBS ${LIBSVM_DIR}/lib lib ${LIBNIFTI_DIR}/lib ${LIBJPEG_DIR}/lib ${TSNE_DIR}/lib)
-
-target_link_libraries (CNNlayer ${EXTRA_LIBS})
