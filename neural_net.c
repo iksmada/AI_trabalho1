@@ -3,7 +3,7 @@
 #include "CNNlayer.c"
 
 #define MAX_THRESHOLD 255
-#define FALSE_NEGATIVE_CONST 10
+#define FALSE_NEGATIVE_CONST 15
 
 typedef struct mkernelbank { /* kernel bank */
     MKernel **K;         /* a vetor of multiband kernels */
