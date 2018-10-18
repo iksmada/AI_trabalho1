@@ -1,3 +1,4 @@
+#include <getopt.h>
 #include "ift.h"
 #include "neural_net.c"
 
@@ -5,12 +6,22 @@ int main(int argc, char *argv[]) {
     iftImage **mask;
     iftMImage **mimg, **cbands, **norm_img;
     NetParameters *nparam;
-    bool debug = false;
+    static int debug, matrix=1;
 
     if (argc < 4)
-        iftError("testing <testX.txt (X=1,2,3,4,5)> <kernel-bank.txt> <input-parameters.txt>", "main");
-    else if (argc > 4)
-        debug = iftCompareStrings("--debug", argv[4]);
+        iftError("testing <testX.txt (X=1,2,3,4,5)> <kernel-bank.txt> <input-parameters.txt> [--debug] [--matrix] [--interactive]", "main");
+    else if (argc > 4) {
+        static struct option long_options[] =
+                {
+                        {"debug", no_argument,       &debug, 1},
+                        {"interactive",   no_argument,    &matrix, 0},
+                        {"matrix",   no_argument,    &matrix, 1},
+                };
+        /* getopt_long stores the option index here. */
+        int option_index = 4;
+
+        while (getopt_long_only(argc, argv, "",long_options, &option_index) != -1);
+    }
     /* Read input images and kernel bank */
 
     iftFileSet *testSet = iftLoadFileSetFromCSV(argv[1], false);
@@ -25,7 +36,10 @@ int main(int argc, char *argv[]) {
         printf("Processing file %s\n", testSet->files[i]->path);
         iftImage *img = iftReadImageByExt(testSet->files[i]->path);
         mask[i] = ReadMaskImage(testSet->files[i]->path);
-        mimg[i] = SingleLayerMatrix(img, Kbank);
+        if (matrix)
+            mimg[i] = SingleLayerMatrix(img, Kbank);
+        else
+            mimg[i] = SingleLayer(img, Kbank);
         iftDestroyImage(&img);
     }
 
